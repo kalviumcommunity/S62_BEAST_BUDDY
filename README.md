@@ -28,3 +28,6 @@ Database : MongoDB (NoSQL)- For storing user answers, animal profiles, and resul
 
 ## Why this Project : 
 With many reasons to choose such a project, whether for enhanced development skills, the satisfaction of creating something fun and engaging, or even potential distribution, creating BeastBuddy can make for an excellent project.
+
+## Deployment Link : 
+Link : https://s62-beast-buddy.onrender.com
