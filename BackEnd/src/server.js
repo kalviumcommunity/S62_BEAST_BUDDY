@@ -1,5 +1,6 @@
 const express = require('express')
 const connectDatabase = require('./DB/database.js')
+const userRouter = require("./routes/user.route.js");
 const app = express()
 
 if(process.env.NODE_ENV !== "PRODUCTION"){
@@ -16,3 +17,5 @@ const port = process.env.PORT;
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 })
+
+module.exports = app;

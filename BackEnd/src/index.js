@@ -9,10 +9,13 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
   const app = require("./server.js");
   const connectDatabase = require("./DB/database.js");
   const { connectDB, getDB } = require("./DB/db.js");
+  const userRouter = require('./routes/user.route.js')
   
   const PORT = process.env.PORT;
   
   connectDB();
+
+  app.use('/users', userRouter);
   
   app.get("/", async (req, res) => {
     try {
