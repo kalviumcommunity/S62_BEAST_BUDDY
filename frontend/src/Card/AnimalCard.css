@@ -1,0 +1,98 @@
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    color: white;
+  }
+  
+  .hero-section {
+    margin-bottom: 20px;
+  }
+  
+  .landing-title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .landing-subtitle {
+    font-size: 2rem;
+    font-weight: 500;
+  }
+  
+  .landing-description {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    max-width: 600px;
+  }
+  
+  .cta-button {
+    background-color: #ff6200;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    color: white;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .cta-button:hover {
+    background-color: #e55b00;
+  }
+  
+  .animal-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Adds space between the animal cards */
+    margin-top: 30px;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  }
+  
+  .animal-card {
+    background-color: #ffffff;
+    color: #333;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    width: 250px; /* Fixed width for each card */
+  }
+  
+  /* .animal-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  } */
+  
+  .animal-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff7e5f;
+  }
+  
+  .animal-subtitle {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-top: 5px;
+    color: #feb47b;
+  }
+  
+  .animal-traits {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #555;
+  }
+  
+  .question-section {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 500;
+  }
+  
