@@ -32,5 +32,5 @@ With many reasons to choose such a project, whether for enhanced development ski
 ## Backend Deployment Link : 
 Link : https://s62-beast-buddy.onrender.com
 
-## Frontend DEployment Link :
+## Frontend Deployment Link :
 link : https://s62-beast-buddy.pages.dev/

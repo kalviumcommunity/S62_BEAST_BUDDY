@@ -1,88 +1,82 @@
-const { getDB } = require('../DB/db');
-const { ObjectId } = require("mongodb");
-
+const User = require('../models/User');
+const mongoose = require('mongoose');
 
 const getUsersController = async (req, res) => {
-  const db = getDB();
   try {
-    const users = await db.collection("users").find().toArray();
+    const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
-    console.log("Error fetching users", error);
+    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-
 const addUserController = async (req, res) => {
-  const db = getDB();
   try {
-    const newUser = req.body;
-    const result = await db.collection("users").insertOne(newUser);
-    res.status(201).json({ message: "User added successfully", data: result });
-  } catch (er) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: er.message });
+    const newUser = new User(req.body);
+    const savedUser = await newUser.save();
+    res.status(201).json({ message: "User added successfully", data: savedUser });
+  } catch (error) {
+    console.error("Error adding user:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 const getSingleUserController = async (req, res) => {
-  const db = getDB();
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   try {
-    const id = req.params.id;
-    const result = await db
-      .collection("Users")
-      .findOne({ _id: new ObjectId(id) });
-    if (!result) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res.status(200).json(result);
-  } catch (er) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", error: er.message });
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 const updateUserController = async (req, res) => {
-  const db = getDB();
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   try {
-    const id = req.params.id;
-    const newData = req.body;
-    const result = await db
-      .collection("Users")
-      .updateOne({ _id: new ObjectId(id) }, { $set: newData });
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ message: "User not found", data: result });
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true, // return updated doc
+      runValidators: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-    return res
-      .status(200)
-      .json({ message: "User Updated Successfully", data: result });
-  } catch (er) {
-    return res.status(500).json({ message: "Internal Server Error" });
+
+    res.status(200).json({ message: "User updated successfully", data: updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 const deleteUserController = async (req, res) => {
-  const db = getDB();
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   try {
-    const id = req.params.id;
-    const result = await db
-      .collection("users")
-      .deleteOne({ _id: new ObjectId(id) });
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "User Not Found" });
-    }
-    res.status(200).json({ message: "User Sucesfully Deleted", data: result });
-  } catch (er) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    const result = await User.findByIdAndDelete(id);
+    if (!result) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "User successfully deleted", data: result });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 module.exports = {
   getUsersController,

@@ -1,0 +1,51 @@
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  color: white;
+}
+
+.hero-section {
+  margin-bottom: 20px;
+}
+
+.landing-title {
+  font-size: 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.landing-subtitle {
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.landing-description {
+  font-size: 1.2rem;
+  margin: 10px 0;
+  max-width: 600px;
+}
+
+.cta-button {
+  background-color: #ff6200;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #e55b00;
+}
+
+.animal-section {
+  margin-top: 30px;
+}
