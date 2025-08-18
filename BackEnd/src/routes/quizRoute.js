@@ -169,7 +169,7 @@ ${JSON.stringify(qaPairs, null, 2)}
 });
 
 
-router.get("/get-animal", async (req, res) => {
+router.get("/get-animal", auth, async (req, res) => {
   try {
     const history = await AnimalMatch.find({ userId: req.userId }).sort({ timestamp: -1 });
     res.json(history);
