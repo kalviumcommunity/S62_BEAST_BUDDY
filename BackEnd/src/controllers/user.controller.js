@@ -46,7 +46,7 @@ const updateUserController = async (req, res) => {
 
   try {
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
-      new: true, // return updated doc
+      new: true,
       runValidators: true,
     });
 

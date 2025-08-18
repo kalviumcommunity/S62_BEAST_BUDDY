@@ -1,13 +1,12 @@
-import './App.css'
-import LandingPage from './pages/LandingPage'
+import React from 'react';
+import LandingPage from './pages/LandingPage';
 
 function App() {
-
   return (
-    <div>
+    <React.StrictMode>
       <LandingPage />
-    </div>
-  )
+    </React.StrictMode>
+  );
 }
 
-export default App
+export default App;

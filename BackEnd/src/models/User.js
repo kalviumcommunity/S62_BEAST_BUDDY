@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
   spiritAnimal: {
     type: String
   },
+  confidenceScore: {
+    type: Number
+  },
   createdAt: {
     type: Date,
     default: Date.now

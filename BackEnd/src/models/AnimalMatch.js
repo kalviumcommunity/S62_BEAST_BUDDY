@@ -1,4 +1,3 @@
-// models/AnimalMatch.js
 const mongoose = require("mongoose");
 
 const animalMatchSchema = new mongoose.Schema({
