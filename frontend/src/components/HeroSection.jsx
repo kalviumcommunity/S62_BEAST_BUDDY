@@ -2,6 +2,7 @@
 import React from 'react';
 import Logo from '../assets/image.png';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 function HeroSection() {
   return (
@@ -30,22 +31,32 @@ function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.6 }}
           >
-            <button className="bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full font-bold text-xl shadow-lg transition duration-300">
+            <Link to="/quiz" className="bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full font-bold text-xl shadow-lg transition duration-300">
               Take Quiz Now
-            </button>
+            </Link>
             <button className="bg-white text-indigo-900 px-6 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transform transition duration-300">
               Learn More
             </button>
           </motion.div>
         </div>
-        <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center">
+        <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center ">
           <motion.img
             src={Logo}
             alt="Spirit Animal"
-            className="w-80 md:w-[35rem]"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
+            className="w-[350px] md:w-[450px] rounded-full bg-gradient-to-tr from-navy-blue-600 to-purple-600 p-4 shadow-2xl"
+            animate={{
+              y: [0, -15, 0],
+              boxShadow: [
+                "0 0 40px 20px rgba(224, 44, 27, 0.73)",
+                "0 0 40px rgba(177, 60, 60, 0.9)",
+                "0 0 20px rgba(255, 165, 0, 0.5)",
+              ],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
         </div>
       </section>

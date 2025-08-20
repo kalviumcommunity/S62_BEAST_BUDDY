@@ -3,7 +3,6 @@ const path = require("path");
 const cors = require("cors");
 const connectDatabase = require("./DB/database.js");
 const quizRouter = require("./routes/quizRoute.js");
-const matchRouter = require("./routes/match.route.js");
 
 const app = express();
 
@@ -17,7 +16,6 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/quiz", quizRouter);
-app.use("/match", matchRouter);
 
 app.get("/ping", (req, res) => {
   res.send("Welcome to BeastBuddy backend");
