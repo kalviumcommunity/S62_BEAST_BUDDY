@@ -3,15 +3,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function QuizPage({ user }) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
-  
-  const navigate = useNavigate();
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [loadingResult, setLoadingResult] = useState(false);
 
-  // 👇 header only if user exists
+  const navigate = useNavigate();
   const headers = user ? { "x-user-id": user._id } : {};
 
   useEffect(() => {
@@ -25,57 +26,111 @@ function QuizPage({ user }) {
         setQuestions(res.data.questions);
       } catch (err) {
         console.error("Error fetching questions:", err);
+      } finally {
+        setLoadingQuestions(false);
       }
     };
     fetchQuestions();
   }, []);
 
   const handleAnswer = async (option) => {
-  const newAnswers = [...answers, option];
-  setAnswers(newAnswers);
+    const newAnswers = [...answers, option];
+    setAnswers(newAnswers);
 
-  if (current < questions.length - 1) {
-    setCurrent(current + 1);
-  } else {
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/quiz/fetch-animal",
-        { questions, answers: newAnswers },
-        { headers }
-      );
-
-      // 👉 Always pass only the actual `result` object
-      navigate("/result", { state: { result: res.data.result } });
-    } catch (err) {
-      console.error("Error fetching result:", err);
+    if (current < questions.length - 1) {
+      setCurrent(current + 1);
+    } else {
+      try {
+        setLoadingResult(true);
+        const res = await axios.post(
+          "http://localhost:8000/quiz/fetch-animal",
+          { questions, answers: newAnswers },
+          { headers }
+        );
+        navigate("/result", { state: { result: res.data.result } });
+      } catch (err) {
+        console.error("Error fetching result:", err);
+      } finally {
+        setLoadingResult(false);
+      }
     }
+  };
+
+  // Loader for quiz questions
+  if (loadingQuestions) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full"
+        />
+        <p className="mt-4 text-gray-300">Loading quiz questions...</p>
+      </div>
+    );
   }
-};
 
-
-  if (!questions.length) return <p className="text-white">Loading questions...</p>;
+  // Loader for AI result
+  if (loadingResult) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-12 h-12 border-4 border-teal-400 border-t-transparent rounded-full"
+        />
+        <p className="mt-4 text-gray-300">Finding your spirit animal...</p>
+      </div>
+    );
+  }
 
   const currentQ = questions[current];
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
-      <div className="max-w-xl p-6 bg-gray-800 rounded-2xl shadow-lg">
-        <h2 className="text-xl font-bold mb-6">{currentQ.question}</h2>
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white px-4 py-10">
+      {/* Quiz Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-2xl p-8 bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-700"
+      >
+        {/* Question */}
+        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-purple-100">
+          {currentQ.question}
+        </h2>
+
+        {/* Options */}
         <div className="space-y-3">
           {currentQ.options.map((opt, idx) => (
-            <button
+            <motion.button
               key={idx}
               onClick={() => handleAnswer(opt)}
-              className="w-full py-2 px-4 bg-teal-600 rounded-xl hover:bg-teal-700 transition"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl 
+                         hover:from-purple-500 hover:to-purple-600 transition text-lg font-medium shadow-md"
             >
               {opt}
-            </button>
+            </motion.button>
           ))}
         </div>
-        <p className="mt-6 text-sm text-gray-400">
-          Question {current + 1} of {questions.length}
-        </p>
-      </div>
+
+        {/* Progress */}
+        <div className="mt-6">
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <motion.div
+              className="bg-purple-400 h-2 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${((current + 1) / questions.length) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          <p className="mt-3 text-sm text-gray-300 text-center">
+            Question {current + 1} of {questions.length}
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }

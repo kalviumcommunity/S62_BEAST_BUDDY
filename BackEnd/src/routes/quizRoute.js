@@ -41,49 +41,7 @@ function safeParseJSON(text) {
  1) Start quiz → generate questions
 -------------------------------- */
 router.post("/start", auth, async (_req, res) => {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `
-You are designing a light, fun **personality quiz** to discover a user's spirit (partner) animal.
-
-Produce exactly 5 short, clear multiple-choice questions that explore:
-- social energy (introvert/extrovert),
-- decision style (instinct vs analysis),
-- risk tolerance,
-- preferred pace (calm vs energetic),
-- values (loyalty, creativity, freedom, wisdom, etc).
-
-For each question, provide 3–4 answer options.
-Keep questions fun, simple, and no more than one sentence.
-
-Return ONLY JSON in this exact shape:
-{
-  "questions": [
-    {
-      "question": "string",
-      "options": ["string", "string", "string", "string"]
-    }
-  ]
-}
-    `.trim();
-
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-    });
-
-    const data = safeParseJSON(result.response.text());
-
-    if (
-      !data ||
-      !Array.isArray(data.questions) ||
-      data.questions.length === 0 ||
-      !data.questions[0].options
-    ) {
-      // fallback questions
-      return res.json({
-        questions: [
+  const fallbackQuestions = [
           {
             question: "Do you feel most energized alone or with a group?",
             options: ["Alone", "With a small group", "With a big group"],
@@ -110,14 +68,55 @@ Return ONLY JSON in this exact shape:
             question: "Which value resonates most?",
             options: ["Loyalty", "Creativity", "Freedom", "Wisdom"],
           },
-        ],
-      });
+        ]
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+      You are designing a light, fun **personality quiz** to discover a user's spirit (partner) animal.
+
+      Produce exactly 5 short, clear multiple-choice questions that explore:
+      - social energy (introvert/extrovert),
+      - decision style (instinct vs analysis),
+      - risk tolerance,
+      - preferred pace (calm vs energetic),
+      - values (loyalty, creativity, freedom, wisdom, etc).
+
+      For each question, provide 3–4 answer options.
+      Keep questions fun, simple, and no more than one sentence.
+
+      Return ONLY JSON in this exact shape:
+      {
+        "questions": [
+          {
+            "question": "string",
+            "options": ["string", "string", "string", "string"]
+          }
+        ]
+      }
+    `.trim();
+
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json" },
+    });
+
+    const data = safeParseJSON(result.response.text());
+
+    if (
+      !data ||
+      !Array.isArray(data.questions) ||
+      data.questions.length === 0 ||
+      !data.questions[0].options
+    ) {
+      // fallback questions
+      return res.json({ questions: fallbackQuestions });
     }
 
     res.json({ questions: data.questions });
   } catch (err) {
     console.error("AI /start error:", err);
-    res.status(500).json({ error: "Could not generate questions." });
+    return res.json({ questions: fallbackQuestions });
   }
 });
 
