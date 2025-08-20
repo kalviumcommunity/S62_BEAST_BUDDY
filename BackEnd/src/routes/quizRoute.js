@@ -4,15 +4,25 @@ const User = require("../models/User");
 const AnimalMatch = require("../models/AnimalMatch");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+if (process.env.NODE_ENV !== "PRODUCTION") {
+  require("dotenv").config({
+    path: "./src/config/.env",
+  });
+}
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+console.log(genAI);
+
+// Simple auth middleware: attach req.userId if present
 const auth = (req, res, next) => {
   const userId = req.header("x-user-id");
-  if (!userId) return res.status(401).json({ error: "Not authenticated" });
-  req.userId = userId;
+  if (userId) {
+    req.userId = userId;
+  }
   next();
 };
 
+// Utility: Safe JSON parsing
 function safeParseJSON(text) {
   try {
     return JSON.parse(text);
@@ -27,23 +37,34 @@ function safeParseJSON(text) {
   }
 }
 
-
+/* ------------------------------
+ 1) Start quiz → generate questions
+-------------------------------- */
 router.post("/start", auth, async (_req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
 You are designing a light, fun **personality quiz** to discover a user's spirit (partner) animal.
-Produce exactly 5 short, clear questions that explore:
+
+Produce exactly 5 short, clear multiple-choice questions that explore:
 - social energy (introvert/extrovert),
 - decision style (instinct vs analysis),
 - risk tolerance,
 - preferred pace (calm vs energetic),
 - values (loyalty, creativity, freedom, wisdom, etc).
 
-Return ONLY JSON:
+For each question, provide 3–4 answer options.
+Keep questions fun, simple, and no more than one sentence.
+
+Return ONLY JSON in this exact shape:
 {
-  "questions": ["Q1", "Q2", "Q3", "Q4", "Q5"]
+  "questions": [
+    {
+      "question": "string",
+      "options": ["string", "string", "string", "string"]
+    }
+  ]
 }
     `.trim();
 
@@ -53,45 +74,75 @@ Return ONLY JSON:
     });
 
     const data = safeParseJSON(result.response.text());
-    if (!data || !Array.isArray(data.questions)) {
+
+    if (
+      !data ||
+      !Array.isArray(data.questions) ||
+      data.questions.length === 0 ||
+      !data.questions[0].options
+    ) {
+      // fallback questions
       return res.json({
         questions: [
-          "Do you feel most energized alone or with a group?",
-          "When facing a problem, do you trust your gut or analyze details?",
-          "Are you more of a risk-taker or risk-avoider?",
-          "Do you prefer a calm routine or fast-paced variety?",
-          "Which value resonates most: loyalty, creativity, freedom, wisdom, or leadership?"
-        ]
+          {
+            question: "Do you feel most energized alone or with a group?",
+            options: ["Alone", "With a small group", "With a big group"],
+          },
+          {
+            question:
+              "When facing a problem, do you trust your gut or analyze details?",
+            options: [
+              "Always gut",
+              "Mostly gut",
+              "Mostly analyze",
+              "Always analyze",
+            ],
+          },
+          {
+            question: "Are you more of a risk-taker or risk-avoider?",
+            options: ["Big risk-taker", "Sometimes", "Rarely", "Never"],
+          },
+          {
+            question: "Do you prefer a calm routine or fast-paced variety?",
+            options: ["Calm routine", "Balanced", "Fast-paced"],
+          },
+          {
+            question: "Which value resonates most?",
+            options: ["Loyalty", "Creativity", "Freedom", "Wisdom"],
+          },
+        ],
       });
     }
+
     res.json({ questions: data.questions });
   } catch (err) {
     console.error("AI /start error:", err);
-    res.json({
-      questions: [
-        "Do you feel most energized alone or with a group?",
-        "When facing a problem, do you trust your gut or analyze details?",
-        "Are you more of a risk-taker or risk-avoider?",
-        "Do you prefer a calm routine or fast-paced variety?",
-        "Which value resonates most: loyalty, creativity, freedom, wisdom, or leadership?"
-      ]
-    });
+    res.status(500).json({ error: "Could not generate questions." });
   }
 });
 
-// -------------------------------------------
-// 2) Submit answers → AI predicts + reasons
-// Body: { questions: string[], answers: string[] }
-// -------------------------------------------
+/* ------------------------------
+ 2) Submit answers → AI predicts animal
+-------------------------------- */
 router.post("/fetch-animal", auth, async (req, res) => {
   try {
     const { questions, answers } = req.body;
 
-    if (!Array.isArray(questions) || !Array.isArray(answers) || questions.length === 0 || questions.length !== answers.length) {
-      return res.status(400).json({ error: "questions[] and answers[] must be same-length non-empty arrays." });
+    if (
+      !Array.isArray(questions) ||
+      !Array.isArray(answers) ||
+      questions.length === 0 ||
+      questions.length !== answers.length
+    ) {
+      return res.status(400).json({
+        error: "questions[] and answers[] must be same-length non-empty arrays.",
+      });
     }
 
-    const qaPairs = questions.map((q, i) => ({ question: q, answer: answers[i] }));
+    const qaPairs = questions.map((q, i) => ({
+      question: typeof q === "string" ? q : q.question, // normalize
+      answer: answers[i],
+    }));
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -126,6 +177,7 @@ ${JSON.stringify(qaPairs, null, 2)}
     });
 
     const parsed = safeParseJSON(result.response.text());
+
     if (
       !parsed ||
       typeof parsed.animalName !== "string" ||
@@ -134,44 +186,69 @@ ${JSON.stringify(qaPairs, null, 2)}
       typeof parsed.funFact !== "string" ||
       typeof parsed.confidence !== "number"
     ) {
-      return res.status(500).json({ error: "AI returned an unexpected format.", raw: result.response.text() });
+      return res.status(500).json({
+        error: "AI returned an unexpected format.",
+        raw: result.response.text(),
+      });
     }
 
-    const matchDoc = await AnimalMatch.create({
-      userId: req.userId,
-      quizQuestions: questions,
-      quizResponses: answers,
-      predictedAnimal: parsed.animalName,
-      confidenceScore: parsed.confidence,
-      matchReason: parsed.reason,
-      strengths: parsed.strengths,
-      funFact: parsed.funFact,
-    });
+    // ✅ Save only if logged in
+    if (req.userId) {
+      const matchDoc = await AnimalMatch.create({
+        userId: req.userId,
+        quizQuestions: questions,
+        quizResponses: answers,
+        predictedAnimal: parsed.animalName,
+        confidenceScore: parsed.confidence,
+        matchReason: parsed.reason,
+        strengths: parsed.strengths,
+        funFact: parsed.funFact,
+      });
 
-    await User.findByIdAndUpdate(
-      req.userId,
-      {
-        spiritAnimal: parsed.animalName,
-        predictionConfidence: parsed.confidence,
-      },
-      { new: true }
-    );
+      await User.findByIdAndUpdate(
+        req.userId,
+        {
+          spiritAnimal: parsed.animalName,
+          predictionConfidence: parsed.confidence,
+        },
+        { new: true }
+      );
 
-    res.json({
-      message: "Prediction successful",
+      return res.json({
+        message: "Prediction successful",
+        result: parsed,
+        saved: { id: matchDoc._id },
+      });
+    }
+
+    // ✅ Guest user → just return result
+    return res.json({
+      success: true,
+      type: "guest",
       result: parsed,
-      saved: { id: matchDoc._id }
     });
   } catch (err) {
-    console.error("AI /submit error:", err);
-    res.status(500).json({ error: "Something went wrong generating the spirit animal." });
+    console.error("AI /fetch-animal error:", err);
+    res
+      .status(500)
+      .json({ error: "Something went wrong generating the spirit animal." });
   }
 });
 
-
+/* ------------------------------
+ 3) Fetch history (only for logged-in users)
+-------------------------------- */
 router.get("/get-animal", auth, async (req, res) => {
   try {
-    const history = await AnimalMatch.find({ userId: req.userId }).sort({ timestamp: -1 });
+    if (!req.userId) {
+      return res
+        .status(401)
+        .json({ error: "Guests do not have history. Please log in." });
+    }
+
+    const history = await AnimalMatch.find({ userId: req.userId }).sort({
+      timestamp: -1,
+    });
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: "Unable to fetch history" });
