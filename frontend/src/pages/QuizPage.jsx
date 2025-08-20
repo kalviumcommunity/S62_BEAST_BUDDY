@@ -63,7 +63,7 @@ function QuizPage({ user }) {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1.3, ease: "linear" }}
-          className="w-12 h-12 border-4 border-pu1.3ple-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full"
         />
         <p className="mt-4 text-gray-300">Loading quiz questions...</p>
       </div>
