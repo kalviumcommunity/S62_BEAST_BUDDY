@@ -11,7 +11,6 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-console.log(genAI);
 
 // Simple auth middleware: attach req.userId if present
 const auth = (req, res, next) => {

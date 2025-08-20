@@ -62,6 +62,8 @@ function QuizPage({ user }) {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
         <motion.div
           animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1.3, ease: "linear" }}
+          className="w-12 h-12 border-4 border-pu1.3ple-500 border-t-transparent rounded-full"
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full"
         />
@@ -75,6 +77,10 @@ function QuizPage({ user }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
         <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: [0, 1], scale: [0.8, 1] }}
+          transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }}
+          className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full"
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           className="w-12 h-12 border-4 border-teal-400 border-t-transparent rounded-full"
@@ -87,6 +93,17 @@ function QuizPage({ user }) {
   const currentQ = questions[current];
 
   return (
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white px-4 py-10">
+      {/* Quiz Card (fade in) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-2xl p-8 bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-700"
+      >
+        {/* Question */}
+        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-purple-400">
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-black text-white px-4 py-10">
       {/* Quiz Card */}
       <motion.div
@@ -108,6 +125,8 @@ function QuizPage({ user }) {
               onClick={() => handleAnswer(opt)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl 
+                         hover:from-purple-600 hover:to-purple-700 transition text-lg font-medium shadow-md"
               className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl 
                          hover:from-purple-500 hover:to-purple-600 transition text-lg font-medium shadow-md"
             >
@@ -120,6 +139,7 @@ function QuizPage({ user }) {
         <div className="mt-6">
           <div className="w-full bg-gray-700 rounded-full h-2">
             <motion.div
+              className="bg-gray-100 h-2 rounded-full"
               className="bg-purple-400 h-2 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${((current + 1) / questions.length) * 100}%` }}
