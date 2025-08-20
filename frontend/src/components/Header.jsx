@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 function Header() {
   return (
@@ -12,8 +13,8 @@ function Header() {
           <a href="#contact" className="hover:text-orange-400 transition">Contact</a>
         </nav>
         <div className="space-x-4">
-          <button className="px-4 py-2 rounded-full bg-white text-indigo-900 font-semibold hover:scale-105 transform transition">Login</button>
-          <button className="px-4 py-2 rounded-full bg-orange-500 hover:bg-orange-600 font-semibold transition">Sign Up</button>
+          <Link to="/login" className="px-4 py-2 rounded-full bg-white text-indigo-900 font-semibold hover:scale-105 transform transition">Login</Link>
+          <Link to="/signup" className="px-4 py-2 rounded-full bg-orange-500 hover:bg-orange-600 font-semibold transition">Sign Up</Link>
         </div>
       </header>
     </div>
