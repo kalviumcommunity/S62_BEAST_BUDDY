@@ -1,4 +1,4 @@
-// src/pages/ResultPage.jsx
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
