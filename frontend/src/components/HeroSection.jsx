@@ -43,7 +43,7 @@ function HeroSection() {
           <motion.img
             src={Logo}
             alt="Spirit Animal"
-            className="w-[350px] md:w-[450px] rounded-full bg-gradient-to-tr from-navy-blue-600 to-purple-600 p-4 shadow-2xl"
+            className="w-[350px] md:w-[450px] rounded-full bg-gradient-to-tr from-navy-blue-600 to-indigo-600 p-4 shadow-2xl"
             animate={{
               y: [0, -15, 0],
               boxShadow: [
