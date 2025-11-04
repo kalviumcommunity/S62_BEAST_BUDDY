@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const AnimalMatch = require("../models/AnimalMatch");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // ✅ Fixed import
 
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
@@ -10,9 +10,8 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
   });
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // ✅ Fixed class name
 
-// Simple auth middleware: attach req.userId if present
 const auth = (req, res, next) => {
   const userId = req.header("x-user-id");
   if (userId) {
@@ -21,7 +20,6 @@ const auth = (req, res, next) => {
   next();
 };
 
-// Utility: Safe JSON parsing
 function safeParseJSON(text) {
   try {
     return JSON.parse(text);
@@ -39,37 +37,44 @@ function safeParseJSON(text) {
 /* ------------------------------
  1) Start quiz → generate questions
 -------------------------------- */
-router.post("/start", auth, async (_req, res) => {
+router.post("/start", auth, async (req, res) => {
   const fallbackQuestions = [
-          {
-            question: "Do you feel most energized alone or with a group?",
-            options: ["Alone", "With a small group", "With a big group"],
-          },
-          {
-            question:
-              "When facing a problem, do you trust your gut or analyze details?",
-            options: [
-              "Always gut",
-              "Mostly gut",
-              "Mostly analyze",
-              "Always analyze",
-            ],
-          },
-          {
-            question: "Are you more of a risk-taker or risk-avoider?",
-            options: ["Big risk-taker", "Sometimes", "Rarely", "Never"],
-          },
-          {
-            question: "Do you prefer a calm routine or fast-paced variety?",
-            options: ["Calm routine", "Balanced", "Fast-paced"],
-          },
-          {
-            question: "Which value resonates most?",
-            options: ["Loyalty", "Creativity", "Freedom", "Wisdom"],
-          },
-        ]
+    {
+      question: "Do you feel most energized alone or with a group?",
+      options: ["Alone", "With a small group", "With a big group"],
+    },
+    {
+      question:
+        "When facing a problem, do you trust your gut or analyze details?",
+      options: [
+        "Always gut",
+        "Mostly gut",
+        "Mostly analyze",
+        "Always analyze",
+      ],
+    },
+    {
+      question: "Are you more of a risk-taker or risk-avoider?",
+      options: ["Big risk-taker", "Sometimes", "Rarely", "Never"],
+    },
+    {
+      question: "Do you prefer a calm routine or fast-paced variety?",
+      options: ["Calm routine", "Balanced", "Fast-paced"],
+    },
+    {
+      question: "Which value resonates most?",
+      options: ["Loyalty", "Creativity", "Freedom", "Wisdom"],
+    },
+  ];
+
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // ✅ Correct way to get model
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      }
+    });
 
     const prompt = `
       You are designing a light, fun **personality quiz** to discover a user's spirit (partner) animal.
@@ -95,12 +100,12 @@ router.post("/start", auth, async (_req, res) => {
       }
     `.trim();
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-    });
+    // ✅ Correct generateContent usage
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    const data = safeParseJSON(result.response.text());
+    const data = safeParseJSON(text);
 
     if (
       !data ||
@@ -108,7 +113,6 @@ router.post("/start", auth, async (_req, res) => {
       data.questions.length === 0 ||
       !data.questions[0].options
     ) {
-      // fallback questions
       return res.json({ questions: fallbackQuestions });
     }
 
@@ -138,11 +142,17 @@ router.post("/fetch-animal", auth, async (req, res) => {
     }
 
     const qaPairs = questions.map((q, i) => ({
-      question: typeof q === "string" ? q : q.question, // normalize
+      question: typeof q === "string" ? q : q.question,
       answer: answers[i],
     }));
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // ✅ Correct model initialization
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      }
+    });
 
     const prompt = `
 You are a personality-to-animal matching expert.
@@ -169,12 +179,12 @@ Q/A:
 ${JSON.stringify(qaPairs, null, 2)}
     `.trim();
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-    });
+    // ✅ Correct generateContent usage
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    const parsed = safeParseJSON(result.response.text());
+    const parsed = safeParseJSON(text);
 
     if (
       !parsed ||
@@ -186,7 +196,7 @@ ${JSON.stringify(qaPairs, null, 2)}
     ) {
       return res.status(500).json({
         error: "AI returned an unexpected format.",
-        raw: result.response.text(),
+        raw: text,
       });
     }
 

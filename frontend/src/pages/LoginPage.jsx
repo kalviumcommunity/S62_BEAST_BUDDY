@@ -14,9 +14,9 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/auth/login", form); // backend route
+      const res = await axios.post("http://localhost:8000/auth/login", form); // backend route
       localStorage.setItem("token", res.data.token);
-      navigate("/"); // redirect after login
+      navigate("/user"); // redirect after login
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
     }

@@ -38,9 +38,9 @@ const ResultPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="text-4xl font-bold mb-6 text-purple-400"
+        className="text-4xl font-bold mb-6 text-green-500"
       >
-        🎉 Your Spirit Animal
+        Your Spirit Animal
       </motion.h1>
 
       <motion.div
@@ -49,11 +49,11 @@ const ResultPage = () => {
         transition={{ duration: 0.8 }}
         className="w-full max-w-2xl p-8 bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-700"
       >
-        <h2 className="text-3xl font-semibold text-green-400">{result.animalName}</h2>
+        <h2 className="text-3xl font-semibold text-green-500 ">{result.animalName}</h2>
         <p className="mt-2 text-gray-300">{result.reason}</p>
 
         <div className="mt-4">
-          <h3 className="text-xl font-semibold text-purple-300">🌟 Strengths</h3>
+          <h3 className="text-xl font-semibold text-green-400">🌟 Strengths</h3>
           <ul className="list-disc list-inside text-gray-300">
             {result.strengths?.map((s, i) => (
               <li key={i}>{s}</li>
@@ -61,11 +61,11 @@ const ResultPage = () => {
           </ul>
         </div>
 
+        <p className="mt-4 text-gray-400">
+          🔮 Confidence: {(result.confidence * 1).toFixed(2)}%
+        </p>
         <p className="mt-4 italic text-yellow-400">💡 {result.funFact}</p>
 
-        <p className="mt-4 text-gray-400">
-          🔮 Confidence: {(result.confidence * 100).toFixed(1)}%
-        </p>
 
         <motion.button
           initial={{ opacity: 0 }}

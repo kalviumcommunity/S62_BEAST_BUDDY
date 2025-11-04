@@ -14,9 +14,9 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/auth/signup", form); // backend route
+      const res = await axios.post("http://localhost:8000/auth/signup", form); // backend route
       localStorage.setItem("token", res.data.token);
-      navigate("/"); // redirect after signup
+      navigate("/user"); // redirect after signup
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     }

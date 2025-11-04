@@ -27,11 +27,12 @@ const features = [
 
 function FeatureSection() {
   return (
-    <div><section id="features" className="px-6 md:px-20 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div>
+      <section id="features" className="px-6 md:px-20 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {features.map((feature, index) => (
           <motion.div
             key={index}
-            className="bg-white bg-opacity-10 backdrop-blur-md p-6 rounded-xl hover:scale-105 transform transition duration-500 cursor-pointer text-center"
+            className="bg-white bg-opacity-10 backdrop-blur-md p-6 rounded-xl hover:scale-105 transition-transform duration-150 ease-out cursor-pointer text-center"
             whileHover={{ scale: 1.1 }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -46,7 +47,7 @@ function FeatureSection() {
       </section>
 
       {/* CTA Section */}
-      <section className="text-center py-16 bg-indigo-800">
+      <section className="text-center py-16">
         <motion.h2
           className="text-3xl md:text-4xl font-bold mb-6"
           initial={{ opacity: 0, y: 20 }}
@@ -61,7 +62,8 @@ function FeatureSection() {
         >
           Take Quiz Now
         </motion.button>
-      </section></div>
+      </section>
+    </div>
   )
 }
 
