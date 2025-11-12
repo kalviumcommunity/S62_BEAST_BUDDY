@@ -17,7 +17,7 @@ function App() {
           <Route path="/result" element={<ResultPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/user-dashboard" element={<ProfilePage />} />
         </Routes>
       </Router>
     </React.StrictMode>
