@@ -51,19 +51,30 @@ function Header() {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {['features', 'about', 'contact'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => scrollToSection(item)}
-                  className={`font-medium capitalize transition-all hover:text-orange-400 ${
-                    isScrolled ? 'text-gray-700' : 'text-white'
-                  }`}
-                >
-                  {item}
-                </button>
+                item === 'contact' ? (
+                  <Link
+                    key={item}
+                    to="/contact"
+                    className={`font-medium capitalize transition-all hover:text-orange-400 ${
+                      isScrolled ? 'text-gray-700' : 'text-white'
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                ) : (
+                  <button
+                    key={item}
+                    onClick={() => scrollToSection(item)}
+                    className={`font-medium capitalize transition-all hover:text-orange-400 ${
+                      isScrolled ? 'text-gray-700' : 'text-white'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                )
               ))}
             </nav>
 
-            {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center space-x-3">
               <Link 
                 to="/login" 

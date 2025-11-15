@@ -29,7 +29,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-blue-950 px-4 py-8">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950 px-4 py-8">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
