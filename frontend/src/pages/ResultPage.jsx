@@ -11,7 +11,7 @@ const ResultPage = () => {
 
   if (!result) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center text-white bg-gradient-to-br from-purple-900 to-blue-950 p-6">
+      <div className="flex flex-col items-center justify-center min-h-screen text-center text-white bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950 p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}

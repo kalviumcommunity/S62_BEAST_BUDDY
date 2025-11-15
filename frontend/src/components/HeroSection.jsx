@@ -31,12 +31,12 @@ function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.6 }}
           >
-            <Link to="/quiz" className="bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full font-bold text-xl shadow-lg transition duration-300">
+            <Link to="/quiz" className="bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full font-bold text-xl shadow-lg hover:scale-105 transform transition duration-300">
               Take Quiz Now
             </Link>
-            <button className="bg-white text-indigo-900 px-6 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transform transition duration-300">
+            <Link to="/learn-more" className="bg-white text-indigo-900 px-6 py-4 rounded-full  font-semibold shadow-lg hover:scale-105 transform transition duration-300">
               Learn More
-            </button>
+            </Link>
           </motion.div>
         </div>
         <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center ">
@@ -64,4 +64,4 @@ function HeroSection() {
   )
 }
 
-export default HeroSection
+export default HeroSection;

@@ -93,7 +93,7 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -105,7 +105,7 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ const ProfilePage = () => {
   });
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900">
+    <div className="flex min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950">
       {/* Sidebar */}
       <Sidebar />
 

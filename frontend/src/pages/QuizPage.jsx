@@ -151,7 +151,7 @@ function QuizPage({ user }) {
   const currentQ = questions[current];
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-purple-900 to-blue-950 text-white px-4 py-8 pt-24">
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950 text-white px-4 py-8 pt-24">
       {/* Progress Bar */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
