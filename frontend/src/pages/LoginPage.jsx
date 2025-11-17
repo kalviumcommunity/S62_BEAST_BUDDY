@@ -18,7 +18,7 @@ const LoginPage = () => {
     setError("");
     
     try {
-      const res = await axios.post("http://localhost:8000/auth/login", form);
+      const res = await axios.post("https://s62-beast-buddy.onrender.com/auth/login", form);
       localStorage.setItem("token", res.data.token);
       navigate("/user-dashboard");
     } catch (err) {
@@ -36,7 +36,6 @@ const LoginPage = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md p-8 bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
@@ -56,7 +55,6 @@ const LoginPage = () => {
           </motion.p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -67,7 +65,6 @@ const LoginPage = () => {
           </motion.div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -119,7 +116,6 @@ const LoginPage = () => {
           </motion.button>
         </form>
 
-        {/* Sign Up Link */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

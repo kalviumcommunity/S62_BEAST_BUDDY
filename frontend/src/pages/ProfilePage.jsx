@@ -4,8 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Sidebar from "../components/Sidebar";
-import MoodButton from "../components/ui/MoodButtonComp";
-import GradientButton from "../components/ui/GradientButton";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -51,7 +49,7 @@ const ProfilePage = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:8000/auth/me", {
+        const res = await axios.get("https://s62-beast-buddy.onrender.com/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -87,7 +85,6 @@ const ProfilePage = () => {
   };
 
   const handleEditProfile = () => {
-    // TODO: Implement edit profile modal or page
     console.log("Edit profile clicked");
   };
 
