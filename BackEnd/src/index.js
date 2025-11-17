@@ -21,7 +21,7 @@ app.use("/quiz", quizRouter);
 app.use("/auth", authRouter);
 app.use("/api/contact", contactRoute);
 
-app.get("/ping", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Welcome to BeastBuddy backend");
 });
 
