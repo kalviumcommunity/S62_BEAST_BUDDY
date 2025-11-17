@@ -40,14 +40,12 @@ const ResultPage = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen text-white bg-gradient-to-br from-purple-900 to-blue-950 px-4 py-8 pt-24">
-      {/* Main Result Card */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, type: "spring" }}
         className="w-full max-w-4xl p-8 bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 mb-8"
       >
-        {/* Result Header */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -70,9 +68,7 @@ const ResultPage = () => {
           </p>
         </motion.div>
 
-        {/* Animal Result */}
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Animal Name & Image Placeholder */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -118,14 +114,12 @@ const ResultPage = () => {
             </motion.div>
           </motion.div>
 
-          {/* Animal Details */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
             className="space-y-6"
           >
-            {/* Reason */}
             <div>
               <h3 className="text-xl font-semibold text-orange-300 mb-3 flex items-center">
                 <span className="mr-2">🔮</span> Why This Animal?
@@ -135,7 +129,6 @@ const ResultPage = () => {
               </p>
             </div>
 
-            {/* Strengths */}
             <div>
               <h3 className="text-xl font-semibold text-orange-300 mb-3 flex items-center">
                 <span className="mr-2">🌟</span> Your Strengths
@@ -156,7 +149,6 @@ const ResultPage = () => {
               </div>
             </div>
 
-            {/* Fun Fact */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -172,7 +164,6 @@ const ResultPage = () => {
         </div>
       </motion.div>
 
-      {/* Action Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -198,7 +189,6 @@ const ResultPage = () => {
         </motion.button>
       </motion.div>
 
-      {/* Share Section */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -223,7 +213,6 @@ const ResultPage = () => {
         </div>
       </motion.div>
 
-      {/* Background decorative elements */}
       <motion.div
         animate={{
           y: [0, -20, 0],

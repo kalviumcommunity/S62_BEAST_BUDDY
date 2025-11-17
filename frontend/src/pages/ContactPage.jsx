@@ -24,7 +24,7 @@ const Contact = () => {
     setStatus("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/contact", {
+      const res = await fetch("https://s62-beast-buddy.onrender.com/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message }),
@@ -36,12 +36,10 @@ const Contact = () => {
         setIsSuccess(true);
         setStatus("Message sent successfully! Redirecting to homepage...");
         
-        // Clear form
         setName("");
         setEmail("");
         setMessage("");
         
-        // Redirect to homepage after 2 seconds
         setTimeout(() => {
           navigate("/");
         }, 2000);
@@ -57,7 +55,6 @@ const Contact = () => {
     }
   };
 
-  // Success state display
   if (isSuccess) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900 text-white">
@@ -182,7 +179,6 @@ const Contact = () => {
           </div>
         </motion.form>
 
-        {/* Status Message */}
         <AnimatePresence>
           {status && !isSuccess && (
             <motion.div
@@ -200,7 +196,6 @@ const Contact = () => {
           )}
         </AnimatePresence>
 
-        {/* Contact Info */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

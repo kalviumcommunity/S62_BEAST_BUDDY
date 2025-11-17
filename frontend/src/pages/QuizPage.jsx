@@ -21,7 +21,7 @@ function QuizPage({ user }) {
     const fetchQuestions = async () => {
       try {
         const res = await axios.post(
-          "http://localhost:8000/quiz/start",
+          "https://s62-beast-buddy.onrender.com/quiz/start",
           {},
           { headers }
         );
@@ -38,7 +38,6 @@ function QuizPage({ user }) {
   const handleAnswer = async (option, index) => {
     setSelectedOption(index);
     
-    // Add a small delay for better UX
     setTimeout(async () => {
       const newAnswers = [...answers, option];
       setAnswers(newAnswers);
@@ -50,7 +49,7 @@ function QuizPage({ user }) {
         try {
           setLoadingResult(true);
           const res = await axios.post(
-            "http://localhost:8000/quiz/fetch-animal",
+            "https://s62-beast-buddy.onrender.com/quiz/fetch-animal",
             { questions, answers: newAnswers },
             { headers }
           );
@@ -64,7 +63,6 @@ function QuizPage({ user }) {
     }, 500);
   };
 
-  // Loader for quiz questions
   if (loadingQuestions) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-blue-950 text-white">
@@ -92,7 +90,6 @@ function QuizPage({ user }) {
     );
   }
 
-  // Loader for AI result
   if (loadingResult) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-900 to-indigo-950 text-white">
@@ -152,7 +149,6 @@ function QuizPage({ user }) {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950 text-white px-4 py-8 pt-24">
-      {/* Progress Bar */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,14 +172,12 @@ function QuizPage({ user }) {
         </div>
       </motion.div>
 
-      {/* Quiz Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
         className="w-full max-w-2xl p-8 bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20"
       >
-        {/* Question Number */}
         <div className="text-center mb-6">
           <motion.span 
             initial={{ scale: 0 }}
@@ -195,7 +189,6 @@ function QuizPage({ user }) {
           </motion.span>
         </div>
 
-        {/* Question */}
         <motion.h2
           key={current}
           initial={{ opacity: 0, x: -20 }}
@@ -206,7 +199,6 @@ function QuizPage({ user }) {
           {currentQ.question}
         </motion.h2>
 
-        {/* Options */}
         <div className="space-y-4">
           {currentQ.options.map((opt, idx) => (
             <motion.button
@@ -251,7 +243,6 @@ function QuizPage({ user }) {
           ))}
         </div>
 
-        {/* Quiz Info */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -264,7 +255,6 @@ function QuizPage({ user }) {
         </motion.div>
       </motion.div>
 
-      {/* Background decorative elements */}
       <motion.div
         animate={{
           y: [0, -10, 0],
