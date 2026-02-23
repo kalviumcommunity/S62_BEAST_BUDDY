@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import apiClient from "../api/client";
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -24,15 +25,9 @@ const Contact = () => {
     setStatus("");
 
     try {
-      const res = await fetch("https://s62-beast-buddy.onrender.com/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
-      });
+      const res = await apiClient.post("/api/contact", { name, email, message });
 
-      const data = await res.json();
-
-      if (data.success) {
+      if (res.data?.success) {
         setIsSuccess(true);
         setStatus("Message sent successfully! Redirecting to homepage...");
         

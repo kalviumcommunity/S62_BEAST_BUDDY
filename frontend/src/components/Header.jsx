@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +26,18 @@ function Header() {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    } else if (location.pathname !== '/') {
+      // If section doesn't exist and we're not on home page, navigate to home
+      navigate('/');
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    const ok = window.confirm('Are you sure you want to log out?');
+    if (!ok) return;
+    logout();
+    navigate('/');
   };
 
   return (
@@ -50,48 +63,76 @@ function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              {['features', 'about', 'contact'].map((item) => (
-                item === 'contact' ? (
-                  <Link
-                    key={item}
-                    to="/contact"
-                    className={`font-medium capitalize transition-all hover:text-orange-400 ${
-                      isScrolled ? 'text-gray-700' : 'text-white'
-                    }`}
-                  >
-                    {item}
-                  </Link>
-                ) : (
-                  <button
-                    key={item}
-                    onClick={() => scrollToSection(item)}
-                    className={`font-medium capitalize transition-all hover:text-orange-400 ${
-                      isScrolled ? 'text-gray-700' : 'text-white'
-                    }`}
-                  >
-                    {item}
-                  </button>
-                )
+              {['features', 'about'].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item)}
+                  className={`font-medium capitalize transition-all hover:text-orange-400 ${
+                    isScrolled ? 'text-gray-700' : 'text-white'
+                  }`}
+                >
+                  {item}
+                </button>
               ))}
-            </nav>
-
-            <div className="hidden md:flex items-center space-x-3">
-              <Link 
-                to="/login" 
-                className={`px-6 py-2 rounded-full font-semibold transition-all border ${
-                  isScrolled 
-                    ? 'bg-white text-indigo-900 border-indigo-200 hover:bg-gray-50 hover:scale-105' 
-                    : 'bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 hover:scale-105'
+              <Link
+                to="/animals"
+                className={`font-medium transition-all hover:text-orange-400 ${
+                  isScrolled ? 'text-gray-700' : 'text-white'
                 }`}
               >
-                Login
+                Encyclopedia
               </Link>
-              <Link 
-                to="/signup" 
-                className="px-6 py-2 rounded-full bg-orange-500 text-white font-semibold transition-all hover:bg-orange-600 hover:scale-105 shadow-lg shadow-orange-500/25"
+              <Link
+                to="/contact"
+                className={`font-medium transition-all hover:text-orange-400 ${
+                  isScrolled ? 'text-gray-700' : 'text-white'
+                }`}
               >
-                Sign Up
+                Contact
               </Link>
+            </nav>
+
+            {/* Right Section: Auth or User Menu */}
+            <div className="hidden md:flex items-center space-x-3">
+              {isAuthenticated && user ? (
+                <>
+                  <Link
+                    to="/user-dashboard"
+                    className={`px-6 py-2 rounded-full font-semibold transition-all border ${
+                      isScrolled 
+                        ? 'bg-indigo-100 text-indigo-900 border-indigo-300 hover:bg-indigo-200 hover:scale-105' 
+                        : 'bg-purple-500/20 text-white border-purple-400/30 backdrop-blur-sm hover:bg-purple-500/30 hover:scale-105'
+                    }`}
+                  >
+                    {user.name || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-2 rounded-full bg-red-500 text-white font-semibold transition-all hover:bg-red-600 hover:scale-105 shadow-lg shadow-red-500/25"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className={`px-6 py-2 rounded-full font-semibold transition-all border ${
+                      isScrolled 
+                        ? 'bg-white text-indigo-900 border-indigo-200 hover:bg-gray-50 hover:scale-105' 
+                        : 'bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 hover:scale-105'
+                    }`}
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="px-6 py-2 rounded-full bg-orange-500 text-white font-semibold transition-all hover:bg-orange-600 hover:scale-105 shadow-lg shadow-orange-500/25"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -130,7 +171,7 @@ function Header() {
           }`}
         >
           <div className="px-4 pt-2 pb-6 space-y-4">
-            {['features', 'about', 'contact'].map((item) => (
+            {['features', 'about'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
@@ -139,19 +180,50 @@ function Header() {
                 {item}
               </button>
             ))}
+            <Link
+              to="/animals"
+              className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-lg hover:bg-indigo-50 hover:text-indigo-900 transition-colors"
+            >
+              Encyclopedia
+            </Link>
+            <Link
+              to="/contact"
+              className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-lg hover:bg-indigo-50 hover:text-indigo-900 transition-colors"
+            >
+              Contact
+            </Link>
             <div className="pt-4 space-y-3 border-t border-gray-200">
-              <Link 
-                to="/login" 
-                className="block w-full text-center px-4 py-3 bg-indigo-100 text-indigo-900 font-semibold rounded-lg hover:bg-indigo-200 transition-colors"
-              >
-                Login
-              </Link>
-              <Link 
-                to="/signup" 
-                className="block w-full text-center px-4 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/25"
-              >
-                Sign Up
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  <Link 
+                    to="/user-dashboard" 
+                    className="block w-full text-center px-4 py-3 bg-indigo-100 text-indigo-900 font-semibold rounded-lg hover:bg-indigo-200 transition-colors"
+                  >
+                    {user.name || 'Profile'}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-center px-4 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors shadow-lg shadow-red-500/25"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="block w-full text-center px-4 py-3 bg-indigo-100 text-indigo-900 font-semibold rounded-lg hover:bg-indigo-200 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="block w-full text-center px-4 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/25"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

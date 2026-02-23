@@ -1,18 +1,32 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React from "react";
+import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FiHome, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const [active, setActive] = useState("Home");
+  const location = useLocation();
 
   const menuItems = [
     { name: "Home", icon: <FiHome />, route: "/home" },
-    { name: "Profile", icon: <FiUser />, route: "/profile" },
+    { name: "Dashboard", icon: <FiUser />, route: "/user-dashboard" },
     { name: "Settings", icon: <FiSettings />, route: "/settings" },
   ];
+
+  const isActive = (route) => {
+    return location.pathname === route;
+  };
+
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    const ok = window.confirm('Are you sure you want to log out?');
+    if (!ok) return;
+    logout();
+    navigate('/');
+  };
 
   return (
     <motion.div
@@ -30,12 +44,10 @@ const Sidebar = () => {
             key={item.name}
             whileHover={{ scale: 1.05 }}
             className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition ${
-              active === item.name ? "bg-orange-500 text-white" : "text-gray-200 hover:bg-gray-700"
+              isActive(item.route) ? "bg-orange-500 text-white" : "text-gray-200 hover:bg-gray-700"
             }`}
             onClick={() => {
-              setActive(item.name);
               if (item.route) navigate(item.route);
-              if (item.action) item.action();
             }}
           >
             <span className="text-xl">{item.icon}</span>
@@ -45,10 +57,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="mt-auto">
-        <button className="my-2 mt-4 w-full py-2 rounded-2xl bg-orange-600 hover:bg-red-600 text-white font-semibold shadow-md transition" onClick={() => {
-          localStorage.removeItem("token");
-          navigate("/");
-        }}>
+        <button className="my-2 mt-4 w-full py-2 rounded-2xl bg-orange-600 hover:bg-red-600 text-white font-semibold shadow-md transition" onClick={handleLogout}>
           Logout
         </button>
         <p className="mt-auto text-gray-400 text-sm text-center">

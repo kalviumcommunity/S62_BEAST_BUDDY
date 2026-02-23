@@ -3,6 +3,9 @@ const router = express.Router();
 const User = require("../models/User");
 const AnimalMatch = require("../models/AnimalMatch");
 const { GoogleGenerativeAI } = require("@google/generative-ai"); // ✅ Fixed import
+const { getOrGenerateSpiritAnimalImage } = require("../utils/spiritAnimalImageCache");
+const jwt = require("jsonwebtoken");
+const authMiddleware = require("../middleware/auth");
 
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
@@ -12,12 +15,23 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // ✅ Fixed class name
 
-const auth = (req, res, next) => {
-  const userId = req.header("x-user-id");
-  if (userId) {
-    req.userId = userId;
+const optionalAuth = (req, _res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return next();
   }
-  next();
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+  } catch (_err) {
+    // Ignore invalid tokens for public routes
+  }
+
+  return next();
 };
 
 function safeParseJSON(text) {
@@ -37,7 +51,7 @@ function safeParseJSON(text) {
 /* ------------------------------
  1) Start quiz → generate questions
 -------------------------------- */
-router.post("/start", auth, async (req, res) => {
+router.post("/start", async (req, res) => {
   const fallbackQuestions = [
     {
       question: "Do you feel most energized alone or with a group?",
@@ -126,9 +140,15 @@ router.post("/start", auth, async (req, res) => {
 /* ------------------------------
  2) Submit answers → AI predicts animal
 -------------------------------- */
-router.post("/fetch-animal", auth, async (req, res) => {
+router.post("/fetch-animal", optionalAuth, async (req, res) => {
   try {
     const { questions, answers } = req.body;
+
+    console.log("DEBUG /fetch-animal received:");
+    console.log("  questions type:", typeof questions, "isArray:", Array.isArray(questions), "length:", questions?.length);
+    console.log("  answers type:", typeof answers, "isArray:", Array.isArray(answers), "length:", answers?.length);
+    console.log("  questions sample:", questions?.[0]);
+    console.log("  answers sample:", answers?.[0]);
 
     if (
       !Array.isArray(questions) ||
@@ -138,6 +158,12 @@ router.post("/fetch-animal", auth, async (req, res) => {
     ) {
       return res.status(400).json({
         error: "questions[] and answers[] must be same-length non-empty arrays.",
+        debug: {
+          questionsIsArray: Array.isArray(questions),
+          answersIsArray: Array.isArray(answers),
+          questionsLength: questions?.length,
+          answersLength: answers?.length,
+        }
       });
     }
 
@@ -201,9 +227,15 @@ ${JSON.stringify(qaPairs, null, 2)}
     }
 
     // ✅ Save only if logged in
-    if (req.userId) {
+    if (req.user?.id) {
+      // Generate or fetch cached spirit animal image
+      const imageUrl = await getOrGenerateSpiritAnimalImage(
+        parsed.animalName,
+        parsed.reason
+      );
+
       const matchDoc = await AnimalMatch.create({
-        userId: req.userId,
+        userId: req.user.id,
         quizQuestions: questions,
         quizResponses: answers,
         predictedAnimal: parsed.animalName,
@@ -211,29 +243,42 @@ ${JSON.stringify(qaPairs, null, 2)}
         matchReason: parsed.reason,
         strengths: parsed.strengths,
         funFact: parsed.funFact,
+        imageUrl: imageUrl, // Store image URL in match history
       });
 
       await User.findByIdAndUpdate(
-        req.userId,
+        req.user.id,
         {
           spiritAnimal: parsed.animalName,
           predictionConfidence: parsed.confidence,
+          spiritAnimalImageUrl: imageUrl, // Store image URL in user profile
         },
         { new: true }
       );
 
       return res.json({
         message: "Prediction successful",
-        result: parsed,
+        result: {
+          ...parsed,
+          imageUrl: imageUrl, // Include image in response
+        },
         saved: { id: matchDoc._id },
       });
     }
 
-    // ✅ Guest user → just return result
+    // ✅ Guest user → generate image but don't save
+    const guestImageUrl = await getOrGenerateSpiritAnimalImage(
+      parsed.animalName,
+      parsed.reason
+    );
+
     return res.json({
       success: true,
       type: "guest",
-      result: parsed,
+      result: {
+        ...parsed,
+        imageUrl: guestImageUrl, // Include image for guests too
+      },
     });
   } catch (err) {
     console.error("AI /fetch-animal error:", err);
@@ -246,16 +291,10 @@ ${JSON.stringify(qaPairs, null, 2)}
 /* ------------------------------
  3) Fetch history (only for logged-in users)
 -------------------------------- */
-router.get("/get-animal", auth, async (req, res) => {
+router.get("/get-animal", authMiddleware, async (req, res) => {
   try {
-    if (!req.userId) {
-      return res
-        .status(401)
-        .json({ error: "Guests do not have history. Please log in." });
-    }
-
-    const history = await AnimalMatch.find({ userId: req.userId }).sort({
-      timestamp: -1,
+    const history = await AnimalMatch.find({ userId: req.user.id }).sort({
+      createdAt: -1,
     });
     res.json(history);
   } catch (err) {

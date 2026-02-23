@@ -89,9 +89,13 @@ const ResultPage = () => {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="w-48 h-48 mx-auto bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 border-4 border-white/20"
+              className="w-48 h-48 mx-auto bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mb-6 border-4 border-white/20 overflow-hidden"
             >
-              <span className="text-2xl w-36"><img src={logo} alt="Animal Logo" /></span>
+              {result.imageUrl ? (
+                <img src={result.imageUrl} alt={result.animalName} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl w-36"><img src={logo} alt="Animal Logo" /></span>
+              )}
             </motion.div>
             <motion.h2
               initial={{ opacity: 0 }}

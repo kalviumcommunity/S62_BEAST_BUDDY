@@ -2,11 +2,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../api/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
-function QuizPage({ user }) {
+function QuizPage({ user: propUser }) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -15,16 +16,17 @@ function QuizPage({ user }) {
   const [selectedOption, setSelectedOption] = useState(null);
 
   const navigate = useNavigate();
-  const headers = user ? { "x-user-id": user._id } : {};
+  const { refetchUser } = useAuth();
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await axios.post(
-          "https://s62-beast-buddy.onrender.com/quiz/start",
-          {},
-          { headers }
-        );
+        // Reset quiz state for new attempt
+        setCurrent(0);
+        setAnswers([]);
+        setSelectedOption(null);
+        
+        const res = await apiClient.post("/quiz/start", {});
         setQuestions(res.data.questions);
       } catch (err) {
         console.error("Error fetching questions:", err);
@@ -48,14 +50,25 @@ function QuizPage({ user }) {
       } else {
         try {
           setLoadingResult(true);
-          const res = await axios.post(
-            "https://s62-beast-buddy.onrender.com/quiz/fetch-animal",
-            { questions, answers: newAnswers },
-            { headers }
-          );
+          
+          console.log("DEBUG: Submitting quiz...");
+          console.log("  questions length:", questions.length, "first:", questions[0]);
+          console.log("  newAnswers length:", newAnswers.length, "content:", newAnswers);
+          
+          const res = await apiClient.post("/quiz/fetch-animal", {
+            questions,
+            answers: newAnswers
+          });
+          console.log("DEBUG: Response received:", res.data);
+          
+          // If logged in, refresh auth user so dashboard/profile updates reflect new spirit animal
+          if (refetchUser) {
+            try { await refetchUser(); } catch (e) { /* ignore */ }
+          }
           navigate("/result", { state: { result: res.data.result } });
         } catch (err) {
           console.error("Error fetching result:", err);
+          console.error("Response data:", err.response?.data);
         } finally {
           setLoadingResult(false);
         }

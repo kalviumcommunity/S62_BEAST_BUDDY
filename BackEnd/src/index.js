@@ -5,6 +5,7 @@ const connectDatabase = require("./DB/database.js");
 const quizRouter = require("./routes/quizRoute.js");
 const authRouter = require("./routes/userAuth.js");
 const contactRoute = require("./routes/contactRoute.js");
+const animalRouter = require("./routes/animalRoute.js");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/quiz", quizRouter);
 app.use("/auth", authRouter);
 app.use("/api/contact", contactRoute);
+app.use("/api/animals", animalRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to BeastBuddy backend");

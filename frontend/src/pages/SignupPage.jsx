@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,8 +19,7 @@ const SignupPage = () => {
     setError("");
     
     try {
-      const res = await axios.post("https://s62-beast-buddy.onrender.com/auth/signup", form);
-      localStorage.setItem("token", res.data.token);
+      await signup(form.name, form.email, form.password);
       navigate("/user-dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");

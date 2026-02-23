@@ -17,22 +17,58 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  avatar: {
+    type: String,
+    default: null
+  },
   spiritAnimal: {
     type: String
+  },
+  spiritAnimalImageUrl: {
+    type: String,
+    default: null
   },
   confidenceScore: {
     type: Number
   },
+  predictionConfidence: {
+    type: Number
+  },
+  preferences: {
+    type: {
+      theme: { type: String, default: "dark" }, // dark or light
+      notifications: { type: Boolean, default: true },
+      language: { type: String, default: "en" }
+    },
+    default: {}
+  },
+  streak: {
+    type: Number,
+    default: 0
+  },
+  lastQuizDate: {
+    type: Date
+  },
   createdAt: {
+    type: Date,
+    default: Date.now,
+    immutable: true
+  },
+  updatedAt: {
     type: Date,
     default: Date.now
   }
 });
 
 userSchema.pre("save", async function(next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) {
+    // Update the updatedAt timestamp on every save
+    this.updatedAt = Date.now();
+    return next();
+  }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  this.updatedAt = Date.now();
   next();
 });
 

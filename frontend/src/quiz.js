@@ -1,8 +1,7 @@
-import axios from "axios";
+import apiClient from "./api/client";
 
-export const fetchAnimal = async (answers, userId = null) => {
-  return axios.post("http://localhost:8000/quiz/fetch-animal", {
-    answers,
-    userId, // can be null
+export const fetchAnimal = async (answers) => {
+  return apiClient.post("/quiz/fetch-animal", {
+    answers
   });
 };
